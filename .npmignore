@@ -1,0 +1,15 @@
+.git
+.github
+.eslintignore
+.eslintrc
+.prettierignore
+.gitignore
+.prettierrc
+__tests__
+dist.browser
+src
+node_modules
+tsconfig.json
+tsconfig.esm.json
+jest.config.ts
+coverage

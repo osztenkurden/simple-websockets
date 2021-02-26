@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "ESNext", 
+        "outDir": "./lib/esm", 
+        "rootDir": "./src", 
+        "strict": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node"
+    },
+    "exclude": [
+        "__tests__/**/*.ts",
+        "lib/**/*.ts",
+        "./jest.config.ts"
+    ],
+}

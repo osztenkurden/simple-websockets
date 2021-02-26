@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "./lib/cjs", 
+    "rootDir": "./src", 
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "__tests__/**/*.ts",
+    "lib/**/*.ts",
+    "./jest.config.ts"
+  ],
+}
