@@ -1,5 +1,5 @@
 import Socket from 'ws';
-import * as Utils from './util';
+import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util';
 import url from 'url';
 import http from 'http';
 class SimpleSocket {
@@ -14,7 +14,7 @@ class SimpleSocket {
 		this.events = new Map();
 		this._socket = data;
 
-		const environment = Utils.getEnvironment();
+		const environment = getEnvironment();
 
 		if (typeof data === 'string') {
 			if (environment === 'unknown') {
@@ -51,7 +51,7 @@ class SimpleSocket {
 
 	send(eventName: string, ...values: any[]) {
 		if (this._socket.readyState !== 1) return false;
-		this._socket.send(Utils.convertEventToMessage(eventName, values));
+		this._socket.send(convertEventToMessage(eventName, values));
 		return true;
 	}
 
@@ -62,10 +62,11 @@ class SimpleSocket {
 		});
 	}
 	private handleData = (data: any) => {
-		const dataObject = Utils.convertMessageToEvent(data);
+		const dataObject = convertMessageToEvent(data);
 		if (!dataObject) return;
 		return this.execute(dataObject.eventName, ...dataObject.values);
 	};
 }
 
+export { getEnvironment, convertMessageToEvent, convertEventToMessage };
 export { SimpleSocket };
