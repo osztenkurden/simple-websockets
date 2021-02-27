@@ -1,9 +1,10 @@
 {
   "name": "simple-websockets",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
+  "type": "module",
   "exports": {
     "import": "./lib/esm/index.js",
     "default": "./lib/cjs/index.js"
