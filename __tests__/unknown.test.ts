@@ -6,6 +6,6 @@ test('util > detect unknown environment', () => {
 
 test('util > throw', () => {
 	expect(() => {
-		new SimpleWebSocket('ws://localhsot:7869');
+	    new SimpleWebSocket('ws://localhsot:7869');
 	}).toThrow();
 });

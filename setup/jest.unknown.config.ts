@@ -11,7 +11,6 @@ export default {
 	resolver: 'jest-ts-webcompat-resolver',
 	globals: {
 		window: {},
-		process: undefined
 	},
 	setupFiles: ['<rootDir>/setup/unknown.setup.ts'],
 	rootDir: '../'
