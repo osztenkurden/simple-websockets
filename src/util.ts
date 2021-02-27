@@ -14,7 +14,7 @@ const convertEventToMessage = (eventName: string, ...values: any[]) => {
 	return JSON.stringify({ eventName, values });
 };
 
-const convertMessageToEvent = (data: string) => {
+const convertMessageToEvent = (data: string): { eventName: string; values: any[] } | null => {
 	if (!data) return null;
 	if (typeof data !== 'string') return null;
 	try {

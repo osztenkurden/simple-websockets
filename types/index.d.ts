@@ -9,7 +9,7 @@ declare class SimpleWebSocket {
     constructor(address: string, protocols?: string | string[]);
     constructor(address: string | url.URL, options?: Socket.ClientOptions | http.ClientRequestArgs);
     constructor(socket: WebSocket | Socket);
-    on(eventName: string, listener: (...args: any[]) => void): void;
+    on(eventName: string, listener: (...args: any) => void): void;
     send(eventName: string, ...values: any[]): boolean;
     private execute;
     private handleData;

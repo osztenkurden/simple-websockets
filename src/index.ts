@@ -31,11 +31,11 @@ class SimpleWebSocket {
 		};
 
 		this._socket.onclose = () => {
-			this.execute('disconnect');
+			this.execute('disconnect', []);
 		};
 	}
 
-	on(eventName: string, listener: (...args: any[]) => void) {
+	on(eventName: string, listener: (...args: any) => void) {
 		const existingListeners = this.events.get(eventName) || [];
 		existingListeners.push(listener);
 		this.events.set(eventName, existingListeners);
@@ -43,11 +43,11 @@ class SimpleWebSocket {
 
 	send(eventName: string, ...values: any[]) {
 		if (this._socket.readyState !== 1) return false;
-		this._socket.send(convertEventToMessage(eventName, values));
+		this._socket.send(convertEventToMessage(eventName, ...values));
 		return true;
 	}
 
-	private execute(eventName: string, ...args: any[]) {
+	private execute(eventName: string, args: any[]) {
 		const listeners = this.events.get(eventName) || [];
 		listeners.forEach(listener => {
 			listener(...args);
@@ -56,7 +56,7 @@ class SimpleWebSocket {
 	private handleData = (data: any) => {
 		const dataObject = convertMessageToEvent(data);
 		if (!dataObject) return;
-		return this.execute(dataObject.eventName, ...dataObject.values);
+		return this.execute(dataObject.eventName, dataObject.values);
 	};
 }
 

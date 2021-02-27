@@ -10,7 +10,7 @@ export default {
 	coverageReporters: ['json-summary', 'text', 'lcov'],
 	resolver: 'jest-ts-webcompat-resolver',
 	globals: {
-		window: {},
+		window: {}
 	},
 	setupFiles: ['<rootDir>/setup/unknown.setup.ts'],
 	rootDir: '../'
