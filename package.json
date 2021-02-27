@@ -34,7 +34,11 @@
       "<rootDir>/setup/jest.browser.config.ts",
       "<rootDir>/setup/jest.unknown.config.ts"
     ],
-    "coverageReporters":["json-summary", "text", "lcov"]
+    "coverageReporters": [
+      "json-summary",
+      "text",
+      "lcov"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -54,7 +58,7 @@
     "jest-ts-webcompat-resolver": "^1.0.0",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
-    "simple-websockets-server": "^1.0.0",
+    "simple-websockets-server": "^1.0.1",
     "ts-jest": "^26.5.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.5"

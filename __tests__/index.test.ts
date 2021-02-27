@@ -54,6 +54,20 @@ test('SimpleWebSocket > handles bad data gracefully', () => {
 	}).not.toThrow();
 });
 
+test("SimpleWebSocket > gets data correctly", async () => {
+	const eventCallback = jest.fn();
+	socket.on("event", eventCallback);
+
+	server.send("event", 1, 2, 3);
+
+	await wait(300);
+
+
+	expect(eventCallback.mock.calls[0][0]).toBe(1);
+	expect(eventCallback.mock.calls[0][0]).toBe(2);
+	expect(eventCallback.mock.calls[0][0]).toBe(3);
+});
+
 test('SimpleWebSocket > handle disconnect gracefully', async () => {
 	const mockCloseCallback = jest.fn();
 	socket.on('disconnect', mockCloseCallback);
