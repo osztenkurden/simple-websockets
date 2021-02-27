@@ -1,8 +1,8 @@
 import Socket from 'ws';
-import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util';
+import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.js';
 import url from 'url';
 import http from 'http';
-class SimpleSocket {
+class SimpleWebSocket {
 	_socket: WebSocket | Socket;
 
 	private events: Map<string, ((...args: any[]) => void)[]>;
@@ -22,21 +22,13 @@ class SimpleSocket {
 			}
 			if (environment === 'browser') {
 				this._socket = new WebSocket(data, options);
-				return;
 			} else {
 				this._socket = new Socket(data, options);
 			}
 		}
-
-		if ('on' in this._socket) {
-			this._socket.on('message', (data: Socket.Data) => {
-				this.handleData(data);
-			});
-		} else {
-			this._socket.onmessage = ev => {
-				this.handleData(ev?.data);
-			};
-		}
+		this._socket.onmessage = (ev: any) => {
+			this.handleData(ev.data);
+		};
 
 		this._socket.onclose = () => {
 			this.execute('disconnect');
@@ -69,4 +61,4 @@ class SimpleSocket {
 }
 
 export { getEnvironment, convertMessageToEvent, convertEventToMessage };
-export { SimpleSocket };
+export { SimpleWebSocket };

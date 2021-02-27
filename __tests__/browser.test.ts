@@ -1,6 +1,6 @@
-import { SimpleWebSocket } from './../src';
+import { getEnvironment, SimpleWebSocket } from './../src/index.js';
+import WebSocket from 'ws';
 import { SimpleWebSocketServer } from './../setup/mockServer.js';
-import Socket from 'ws';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
@@ -10,48 +10,39 @@ const mockConnectionCallback = jest.fn();
 
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 beforeAll(done => {
-	server = new SimpleWebSocketServer({ port: 7689 }, () => {
-		socket = new SimpleWebSocket('ws://localhost:7689/');
+	server = new SimpleWebSocketServer({ port: 7698 }, () => {
+		socket = new SimpleWebSocket('ws://localhost:7698/');
 		socket.on('connection', mockConnectionCallback);
-		socketWithWs = new SimpleWebSocket(new Socket('ws://localhost:7689/'));
+		socketWithWs = new SimpleWebSocket(new WebSocket('ws://localhost:7698/'));
 		socketWithWs.on('connection', mockConnectionCallback);
+		delete (socketWithWs as any)._socket.on;
 		done();
 	});
 });
+
+test('util > detect browser environment', () => {
+	expect(getEnvironment()).toBe('browser');
+});
 test('SimpleWebSocket > create an instance', () => {
-	expect(socket).toBeInstanceOf(SimpleWebSocket);
+	expect(socketWithWs).toBeInstanceOf(SimpleWebSocket);
 });
 test('SimpleWebSocket > register listener', async () => {
-	await wait(300);
+	await wait(500);
 
 	expect(mockConnectionCallback.mock.calls.length).toBe(2);
 });
 test('SimpleWebSocket > register listener', () => {
 	expect(async () => {
 		server.send('unregistered event');
+		server.clients.forEach(socket => {
+			socket.send(null);
+		});
 		await wait(500);
 	}).not.toThrow();
 });
 
 test('SimpleWebSocket > sends data to server', () => {
-	expect(socket.send('test event')).toBe(true);
-});
-/*
-test("SimpleWebSocket > fails when unconnected", () => {
-    const socket = new SimpleWebSocket('ws://localhost:7689/');
-
-    const result = socket.send("foo","bar");
-    expect(result).toBe(false);
-
-});*/
-test('SimpleWebSocket > handles bad data gracefully', () => {
-	expect(async () => {
-		server.clients.forEach(socket => {
-			socket.send('absolutely random data');
-		});
-
-		await wait(300);
-	}).not.toThrow();
+	expect(socketWithWs.send('test event')).toBe(true);
 });
 
 test('SimpleWebSocket > handle disconnect gracefully', async () => {
@@ -60,13 +51,13 @@ test('SimpleWebSocket > handle disconnect gracefully', async () => {
 	socketWithWs.on('disconnect', mockCloseCallback);
 	socket._socket.close();
 	socketWithWs._socket.close();
-	await wait(300);
+	await wait(500);
 
 	expect(mockCloseCallback.mock.calls.length).toBe(2);
 });
 
 test('SimpleWebSocket > dont throw when not connected', () => {
-	expect(socket.send(':)')).toBe(false);
+	expect(socketWithWs.send(':)')).toBe(false);
 });
 
 afterAll(done => {

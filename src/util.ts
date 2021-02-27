@@ -1,16 +1,13 @@
+import { isBrowser, isNode } from 'browser-or-node';
+
 const getEnvironment = () => {
-	const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
-	const isBrowser = !isNode && (typeof window !== 'undefined' || typeof self !== 'undefined');
-
-	let environment: 'unknown' | 'node' | 'browser' = 'unknown';
-
 	if (isBrowser) {
-		environment = 'browser';
+		return 'browser';
 	} else if (isNode) {
-		environment = 'node';
+		return 'node';
 	}
 
-	return environment;
+	return 'unknown';
 };
 
 const convertEventToMessage = (eventName: string, ...values: any[]) => {

@@ -6,6 +6,7 @@
 .gitignore
 .prettierrc
 __tests__
+setup
 dist.browser
 src
 node_modules
