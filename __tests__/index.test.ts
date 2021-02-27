@@ -64,8 +64,8 @@ test("SimpleWebSocket > gets data correctly", async () => {
 
 
 	expect(eventCallback.mock.calls[0][0]).toBe(1);
-	expect(eventCallback.mock.calls[0][0]).toBe(2);
-	expect(eventCallback.mock.calls[0][0]).toBe(3);
+	expect(eventCallback.mock.calls[0][1]).toBe(2);
+	expect(eventCallback.mock.calls[0][2]).toBe(3);
 });
 
 test('SimpleWebSocket > handle disconnect gracefully', async () => {
