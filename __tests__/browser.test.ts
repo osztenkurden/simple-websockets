@@ -1,6 +1,6 @@
 import { getEnvironment, SimpleWebSocket } from './../src/index.js';
 import WebSocket from 'ws';
-import { SimpleWebSocketServer } from './../setup/mockServer.js';
+import { SimpleWebSocketServer } from 'simple-websockets-server';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;

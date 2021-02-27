@@ -1,5 +1,5 @@
 import { SimpleWebSocket } from './../src';
-import { SimpleWebSocketServer } from './../setup/mockServer.js';
+import { SimpleWebSocketServer } from 'simple-websockets-server';
 import Socket from 'ws';
 
 let server: SimpleWebSocketServer;
