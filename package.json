@@ -1,6 +1,6 @@
 {
   "name": "simple-websockets",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
@@ -41,7 +41,7 @@
     ]
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/lexogrine/typescript-boilerplate/issues"
   },
@@ -58,7 +58,7 @@
     "jest-ts-webcompat-resolver": "^1.0.0",
     "nodemon": "^2.0.7",
     "prettier": "^2.2.1",
-    "simple-websockets-server": "^1.0.1",
+    "simple-websockets-server": "^1.0.2",
     "ts-jest": "^26.5.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.5"

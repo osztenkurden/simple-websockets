@@ -2,6 +2,12 @@ import Socket from 'ws';
 import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.js';
 import url from 'url';
 import http from 'http';
+
+type AddEventListener = <K extends 'message' | 'close' | 'error' | 'open'>(
+	type: K,
+	listener: (this: WebSocket, ev: WebSocketEventMap[K]) => any,
+	options?: boolean | AddEventListenerOptions | undefined
+) => void;
 class SimpleWebSocket {
 	_socket: WebSocket | Socket;
 
@@ -26,13 +32,18 @@ class SimpleWebSocket {
 				this._socket = new Socket(data, options);
 			}
 		}
-		this._socket.onmessage = (ev: any) => {
-			this.handleData(ev.data);
-		};
 
-		this._socket.onclose = () => {
-			this.execute('disconnect', []);
-		};
+		const addEventListener = this._socket.addEventListener.bind(this._socket) as AddEventListener;
+
+		addEventListener('open', () => {
+			this.execute('connection');
+		});
+		addEventListener('message', event => {
+			this.handleData(event.data);
+		});
+		addEventListener('close', () => {
+			this.execute('disconnect');
+		});
 	}
 
 	on(eventName: string, listener: (...args: any) => void) {
@@ -47,7 +58,7 @@ class SimpleWebSocket {
 		return true;
 	}
 
-	private execute(eventName: string, args: any[]) {
+	private execute(eventName: string, args: any[] = []) {
 		const listeners = this.events.get(eventName) || [];
 		listeners.forEach(listener => {
 			listener(...args);

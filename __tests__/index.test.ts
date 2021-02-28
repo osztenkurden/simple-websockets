@@ -54,14 +54,13 @@ test('SimpleWebSocket > handles bad data gracefully', () => {
 	}).not.toThrow();
 });
 
-test("SimpleWebSocket > gets data correctly", async () => {
+test('SimpleWebSocket > gets data correctly', async () => {
 	const eventCallback = jest.fn();
-	socket.on("event", eventCallback);
+	socket.on('event', eventCallback);
 
-	server.send("event", 1, 2, 3);
+	server.send('event', 1, 2, 3);
 
 	await wait(300);
-
 
 	expect(eventCallback.mock.calls[0][0]).toBe(1);
 	expect(eventCallback.mock.calls[0][1]).toBe(2);

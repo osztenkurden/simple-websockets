@@ -6,7 +6,7 @@
 # Simple Websockets
 
 ## What is it for?
-It's super easy, super thin client package for event systems in WebSockets to work with `simple-websockets-server`. (inspired by socket.io but with absolutely nothing else).
+It's super easy, super thin client package for event systems in WebSockets to work with `simple-websockets-server` (inspired by socket.io but with no bloat).
 
 # API example #1 - browser & node
 
@@ -15,7 +15,7 @@ import { SimpleWebSocket } from 'simple-websockets';
 
 const socket = new SimpleWebSocket("ws://localhost:123");
 
-socket._socket // Native WebSocket in browser, or ws instance in node
+socket._socket // Instance of native WebSocket in browser, or ws in node
 
 socket.on("event name", (arg1, arg2, arg3) => {
     // Listen for custom event from server
@@ -49,7 +49,7 @@ const socket = new SimpleWebSocket(webSocket);
 
 # Documentation
 
-To constructor you can pass the same options as for `ws` (node) or `WebSocket` (browser) or the sockets itself.
+To constructor you can pass the same options as for `ws` (node) or `WebSocket` (browser) or the sockets themselves.
 
 
 `socket.send` sends to server stringified JSON object
@@ -63,7 +63,7 @@ To constructor you can pass the same options as for `ws` (node) or `WebSocket` (
 
 where `values` is the array of arguments after first argument of `send` method.
 
-`socket.on` listens for incoming data that fits the object and calls listener.
+`socket.on` listens for incoming data that fits the scheme and calls listener.
 
 You can send events without values.
 
@@ -71,4 +71,4 @@ Event name must be non-empty string.
 
 By default socket calls `connection` and `disconnect` events on its own (without any arguments)
 
-This package is for now considered feature-complete - will probably add any features, only bugfixes.
+This package is for now considered feature-complete - probably will not add any features, only bugfixes.
