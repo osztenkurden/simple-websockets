@@ -1,6 +1,7 @@
 import { SimpleWebSocket } from './../src';
 import { SimpleWebSocketServer } from 'simple-websockets-server';
 import Socket from 'ws';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
@@ -13,7 +14,9 @@ beforeAll(done => {
 	server = new SimpleWebSocketServer({ port: 7689 }, () => {
 		socket = new SimpleWebSocket('ws://localhost:7689/');
 		socket.on('connection', mockConnectionCallback);
-		socketWithWs = new SimpleWebSocket(new Socket('ws://localhost:7689/'));
+		socketWithWs = new SimpleWebSocket(
+			new ReconnectingWebSocket('ws://localhost:7689/', [], { WebSocket: Socket })
+		);
 		socketWithWs.on('connection', mockConnectionCallback);
 		done();
 	});

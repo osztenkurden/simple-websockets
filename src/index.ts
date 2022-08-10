@@ -2,6 +2,7 @@ import Socket from 'ws';
 import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.js';
 import url from 'url';
 import http from 'http';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 type AddEventListener = <K extends 'message' | 'close' | 'error' | 'open'>(
 	type: K,
@@ -16,14 +17,14 @@ interface EventDescriptor {
 	once: boolean;
 }
 class SimpleWebSocket {
-	_socket: WebSocket | Socket;
+	_socket: ReconnectingWebSocket;
 
 	private events: Map<string, EventDescriptor[]>;
 	private maxListeners: number;
 
 	constructor(address: string, protocols?: string | string[]);
 	constructor(address: string | url.URL, options?: Socket.ClientOptions | http.ClientRequestArgs);
-	constructor(socket: WebSocket | Socket);
+	constructor(socket: ReconnectingWebSocket);
 	constructor(data: any, options?: any) {
 		this.events = new Map();
 		this._socket = data;
@@ -36,9 +37,9 @@ class SimpleWebSocket {
 				throw new Error('Unknown environment');
 			}
 			if (environment === 'browser') {
-				this._socket = new WebSocket(data, options);
+				this._socket = new ReconnectingWebSocket(data, [], { ...(options || {}), WebSocket: WebSocket });
 			} else {
-				this._socket = new Socket(data, options);
+				this._socket = new ReconnectingWebSocket(data, [], { ...(options || {}), WebSocket: Socket });
 			}
 		}
 

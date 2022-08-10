@@ -3,18 +3,19 @@ import Socket from 'ws';
 import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.js';
 import url from 'url';
 import http from 'http';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 declare type Listener = (...args: any[]) => void;
 interface EventDescriptor {
 	listener: Listener;
 	once: boolean;
 }
 declare class SimpleWebSocket {
-	_socket: WebSocket | Socket;
+	_socket: ReconnectingWebSocket;
 	private events;
 	private maxListeners;
 	constructor(address: string, protocols?: string | string[]);
 	constructor(address: string | url.URL, options?: Socket.ClientOptions | http.ClientRequestArgs);
-	constructor(socket: WebSocket | Socket);
+	constructor(socket: ReconnectingWebSocket);
 	eventNames: () => string[];
 	getMaxListeners: () => number;
 	listenerCount: (eventName: string) => number;
