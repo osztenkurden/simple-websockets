@@ -29,10 +29,15 @@
     "url": "git+https://github.com/osztenkurden/simple-websockets.git"
   },
   "jest": {
+    "testPathIgnorePatterns": ["<rootDir>/lib/"],
+    "modulePathIgnorePatterns": ["<rootDir>/lib/"],
     "projects": [
       "<rootDir>/setup/jest.node.config.ts",
       "<rootDir>/setup/jest.browser.config.ts",
       "<rootDir>/setup/jest.unknown.config.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/*"
     ],
     "coverageReporters": [
       "json-summary",

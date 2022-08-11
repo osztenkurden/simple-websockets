@@ -10,11 +10,12 @@ interface EventDescriptor {
 	once: boolean;
 }
 declare class SimpleWebSocket {
-	_socket: ReconnectingWebSocket;
+	_socket: Socket | WebSocket | ReconnectingWebSocket;
 	private events;
 	private maxListeners;
 	constructor(address: string, protocols?: string | string[]);
 	constructor(address: string | url.URL, options?: Socket.ClientOptions | http.ClientRequestArgs);
+	constructor(socket: Socket | WebSocket);
 	constructor(socket: ReconnectingWebSocket);
 	eventNames: () => string[];
 	getMaxListeners: () => number;
