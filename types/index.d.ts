@@ -9,12 +9,16 @@ interface EventDescriptor {
 	listener: Listener;
 	once: boolean;
 }
+declare type NativeOptions = Socket.ClientOptions | http.ClientRequestArgs;
+export declare type Options = NativeOptions & {
+	native?: boolean;
+};
 declare class SimpleWebSocket {
 	_socket: Socket | WebSocket | ReconnectingWebSocket;
 	private events;
 	private maxListeners;
 	constructor(address: string, protocols?: string | string[]);
-	constructor(address: string | url.URL, options?: Socket.ClientOptions | http.ClientRequestArgs);
+	constructor(address: string | url.URL, options?: Options);
 	constructor(socket: Socket | WebSocket);
 	constructor(socket: ReconnectingWebSocket);
 	eventNames: () => string[];

@@ -1,4 +1,4 @@
-![Statements](https://img.shields.io/badge/Coverage-100%25-brightgreen.svg) 
+![Statements](https://img.shields.io/badge/Coverage-98.41%25-brightgreen.svg) 
 ![CI](https://img.shields.io/github/workflow/status/osztenkurden/simple-websockets/CI)
 ![Dependencies](https://img.shields.io/david/osztenkurden/simple-websockets)
 ![Downloads](https://img.shields.io/npm/dm/simple-websockets)

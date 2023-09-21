@@ -16,6 +16,11 @@ interface EventDescriptor {
 	listener: Listener;
 	once: boolean;
 }
+
+type NativeOptions = Socket.ClientOptions | http.ClientRequestArgs;
+
+export type Options = NativeOptions & { native?: boolean };
+
 class SimpleWebSocket {
 	_socket: Socket | WebSocket | ReconnectingWebSocket;
 
@@ -23,7 +28,7 @@ class SimpleWebSocket {
 	private maxListeners: number;
 
 	constructor(address: string, protocols?: string | string[]);
-	constructor(address: string | url.URL, options?: Socket.ClientOptions | http.ClientRequestArgs);
+	constructor(address: string | url.URL, options?: Options);
 	constructor(socket: Socket | WebSocket);
 	constructor(socket: ReconnectingWebSocket);
 	constructor(data: any, options?: any) {
@@ -38,9 +43,17 @@ class SimpleWebSocket {
 				throw new Error('Unknown environment');
 			}
 			if (environment === 'browser') {
-				this._socket = new ReconnectingWebSocket(data, [], { ...(options || {}), WebSocket: WebSocket });
+				if (options?.native) {
+					this._socket = new WebSocket(data, options);
+				} else {
+					this._socket = new ReconnectingWebSocket(data, [], { ...(options || {}), WebSocket: WebSocket });
+				}
 			} else {
-				this._socket = new ReconnectingWebSocket(data, [], { ...(options || {}), WebSocket: Socket });
+				if (options?.native) {
+					this._socket = new Socket(data, options);
+				} else {
+					this._socket = new ReconnectingWebSocket(data, [], { ...(options || {}), WebSocket: Socket });
+				}
 			}
 		}
 
