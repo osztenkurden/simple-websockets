@@ -17,17 +17,22 @@ type AutoReconnectOption = {
 };
 type Options = NativeOptions & AutoReconnectOption;
 
-type DefaultEvents = {
+type ExtendDefaultEvents<T extends Record<string | number | symbol, any[]>> = T & {
     connection: [];
     disconnect: [];
 };
-declare class SimpleWebSocket<T extends Record<string, any[]> = any> extends EventEmitter<T & DefaultEvents> {
+type DefaultEventMap = [never];
+type Key<K, T> = T extends DefaultEventMap ? string | symbol : K | keyof T;
+type Listener<K, T, F> = T extends DefaultEventMap ? F : (K extends keyof T ? (T[K] extends unknown[] ? (...args: T[K]) => void : never) : F);
+type Listener1<K, T> = Listener<K, T, (...args: any[]) => void>;
+declare class SimpleWebSocket<T extends Record<string, any[]> = {}> extends EventEmitter<ExtendDefaultEvents<T>> {
     _socket: Socket | WebSocket | ReconnectingWebSocket;
     constructor(address: string, options?: AutoReconnectOption, protocols?: string | string[]);
     constructor(address: string | url.URL, options?: Options);
     constructor(socket: Socket | WebSocket);
     constructor(socket: ReconnectingWebSocket);
-    send<K extends keyof T>(eventName: K, ...values: T[K]): boolean;
+    on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    send<K extends keyof T | string & {}>(eventName: K, ...values: T[K]): boolean;
     private handleData;
 }
 

@@ -17,12 +17,22 @@ type AutoReconnectOption = { autoReconnect?: boolean };
 export type Options = NativeOptions & AutoReconnectOption;
 export { getEnvironment, convertMessageToEvent, convertEventToMessage };
 
-type DefaultEvents = {
+type ExtendDefaultEvents<T extends Record<string | number | symbol, any[]>> = T & {
 	connection: [],
 	disconnect: []
 }
 
-export class SimpleWebSocket<T extends Record<string, any[]> = any> extends EventEmitter<T & DefaultEvents> {
+type DefaultEventMap = [never];
+type Key<K, T> = T extends DefaultEventMap ? string | symbol : K | keyof T;
+type Listener<K, T, F> = T extends DefaultEventMap ? F : (
+	K extends keyof T ? (
+		T[K] extends unknown[] ? (...args: T[K]) => void : never
+	)
+	: F
+);
+type Listener1<K, T> = Listener<K, T, (...args: any[]) => void>;
+
+export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends EventEmitter<ExtendDefaultEvents<T>> {
 	_socket: Socket | WebSocket | ReconnectingWebSocket;
 
 	constructor(address: string, options?: AutoReconnectOption, protocols?: string | string[]);
@@ -66,8 +76,11 @@ export class SimpleWebSocket<T extends Record<string, any[]> = any> extends Even
 			(this.emit as any)('disconnect');
 		});
 	}
+	override on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
+		return super.on(eventName, listener as any);
+	}
 
-	send<K extends keyof T>(eventName: K, ...values: T[K]) {
+	send<K extends keyof T | string & {}>(eventName: K, ...values: T[K]) {
 		if (this._socket.readyState !== 1) return false;
 		this._socket.send(convertEventToMessage(eventName as string, ...values));
 		return true;
