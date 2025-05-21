@@ -1,17 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
-    "module": "commonjs",
-    "declaration": true,
-    "outDir": "./lib/cjs", 
-    "rootDir": "./src", 
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2022",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
     "strict": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true
-  },
-  "exclude": [
-    "__tests__/**/*.ts",
-    "lib/**/*.ts",
-    "setup/**/*.ts"
-  ],
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "module": "preserve",
+    "noEmit": true,
+    "lib": [
+      "es2022",
+      "dom",
+      "dom.iterable"
+    ]
+  }
 }

@@ -6,7 +6,7 @@
 # Simple Websockets
 
 ## What is it for?
-It's super easy, super thin client package for event systems in WebSockets to work with `simple-websockets-server` (inspired by socket.io but with no bloat).
+It's super easy, super thin client package for event systems in WebSockets to work with `simple-websockets/server` (inspired by socket.io but with no bloat).
 
 # API example #1 - browser & node
 
