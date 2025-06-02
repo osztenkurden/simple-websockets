@@ -19,7 +19,8 @@ export { getEnvironment, convertMessageToEvent, convertEventToMessage };
 
 type ExtendDefaultEvents<T extends Record<string | number | symbol, any[]>> = T & {
 	connection: [],
-	disconnect: []
+	disconnect: [close: { code: number, reason: string, wasClean: boolean }],
+	error: [err: { message: string, error: any }]
 }
 
 type DefaultEventMap = [never];
@@ -72,9 +73,12 @@ export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends Event
 		addEventListener('message', event => {
 			this.handleData(event.data);
 		});
-		addEventListener('close', () => {
-			(this.emit as any)('disconnect');
+		addEventListener('close', (data) => {
+			(this.emit as any)('disconnect', data);
 		});
+		addEventListener("error", err => {
+			(this.emit as any)("error", err);
+		})
 	}
 	override on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
 		return super.on(eventName, listener as any);

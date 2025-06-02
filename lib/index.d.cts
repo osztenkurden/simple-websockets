@@ -6,7 +6,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 declare const getEnvironment: () => "browser" | "node" | "unknown";
 declare const convertEventToMessage: (eventName: string, ...values: any[]) => string;
-declare const convertMessageToEvent: (data: string) => {
+declare const convertMessageToEvent: (data: string | Buffer) => {
     eventName: string;
     values: any[];
 } | null;
@@ -19,7 +19,15 @@ type Options = NativeOptions & AutoReconnectOption;
 
 type ExtendDefaultEvents<T extends Record<string | number | symbol, any[]>> = T & {
     connection: [];
-    disconnect: [];
+    disconnect: [close: {
+        code: number;
+        reason: string;
+        wasClean: boolean;
+    }];
+    error: [err: {
+        message: string;
+        error: any;
+    }];
 };
 type DefaultEventMap = [never];
 type Key<K, T> = T extends DefaultEventMap ? string | symbol : K | keyof T;
