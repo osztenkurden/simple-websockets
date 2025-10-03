@@ -4,7 +4,7 @@ import url from 'url';
 import http from 'http';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-declare const getEnvironment: () => "browser" | "node" | "unknown";
+declare const getEnvironment: () => "browser" | "node";
 declare const convertEventToMessage: (eventName: string, ...values: any[]) => string;
 declare const convertMessageToEvent: (data: string | Buffer) => {
     eventName: string;
@@ -40,6 +40,14 @@ declare class SimpleWebSocket<T extends Record<string, any[]> = {}> extends Even
     constructor(socket: Socket | WebSocket);
     constructor(socket: ReconnectingWebSocket);
     on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    addListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    prependListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    prependOnceListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    once<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    off<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    removeListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
+    emit<K extends keyof T | string & {}>(eventName: K, ...values: T[K]): boolean;
+    eventNames<K extends keyof T | string & {}>(): (K | symbol)[];
     send<K extends keyof T | string & {}>(eventName: K, ...values: T[K]): boolean;
     private handleData;
 }

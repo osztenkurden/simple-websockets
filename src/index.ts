@@ -47,9 +47,6 @@ export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends Event
 		const environment = getEnvironment();
 
 		if (typeof data === 'string') {
-			if (environment === 'unknown') {
-				throw new Error('Unknown environment');
-			}
 			if (environment === 'browser') {
 				if (options?.autoReconnect) {
 					this._socket = new ReconnectingWebSocket(data, protocols, { ...(options || {}), WebSocket: WebSocket });
@@ -82,6 +79,34 @@ export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends Event
 	}
 	override on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
 		return super.on(eventName, listener as any);
+	}
+	override addListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
+		return super.addListener(eventName, listener as any);
+	}
+	override prependListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
+		return super.prependListener(eventName, listener as any);
+	}
+	override prependOnceListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
+		return super.prependOnceListener(eventName, listener as any);
+	}
+	override once<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
+		return super.once(eventName, listener as any);
+	}
+	override off<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
+		return super.off(eventName, listener as any);
+	}
+	override removeListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
+		return super.removeListener(eventName, listener as any);
+	}
+	//@ts-expect-error We are aware of the signature mismatch, we want to only allow string-based events
+	override emit<K extends keyof T | string & {}>(eventName: K, ...values: T[K]) {
+		//@ts-expect-error Same as above
+		return super.emit(eventName, ...values);
+	}
+
+	//@ts-expect-error We are aware of the signature mismatch, we want to only allow string-based events
+	override eventNames<K extends keyof T | string & {}>() {
+		return super.eventNames() as (K | symbol)[];
 	}
 
 	send<K extends keyof T | string & {}>(eventName: K, ...values: T[K]) {
