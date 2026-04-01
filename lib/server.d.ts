@@ -1,14 +1,13 @@
-import Socket, { WebSocketServer } from 'ws';
+import ws, { WebSocketServer } from 'ws';
 import http from 'http';
 import { SimpleWebSocket } from './index.js';
 import 'events';
-import 'url';
 import 'reconnecting-websocket';
 
 type ListenerCallback = (socket: SimpleWebSocket<any>, request: http.IncomingMessage) => void;
 declare class SimpleWebSocketServer<T extends Record<string, any[]> = any> extends WebSocketServer {
     connectionListeners: ListenerCallback[];
-    constructor(options?: Socket.ServerOptions, callback?: () => void);
+    constructor(options?: ws.ServerOptions, callback?: () => void);
     onConnection(listener: (socket: SimpleWebSocket<T>, request: http.IncomingMessage) => void): void;
     send(eventName: string, ...values: any[]): void;
 }

@@ -1,7 +1,4 @@
-import Socket from 'ws';
 import EventEmitter from 'events';
-import url from 'url';
-import http from 'http';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 declare const getEnvironment: () => "browser" | "node";
@@ -11,11 +8,10 @@ declare const convertMessageToEvent: (data: string | Buffer) => {
     values: any[];
 } | null;
 
-type NativeOptions = Socket.ClientOptions | http.ClientRequestArgs;
 type AutoReconnectOption = {
     autoReconnect?: boolean;
 };
-type Options = NativeOptions & AutoReconnectOption;
+type Options = AutoReconnectOption;
 
 type ExtendDefaultEvents<T extends Record<string | number | symbol, any[]>> = T & {
     connection: [];
@@ -34,10 +30,9 @@ type Key<K, T> = T extends DefaultEventMap ? string | symbol : K | keyof T;
 type Listener<K, T, F> = T extends DefaultEventMap ? F : (K extends keyof T ? (T[K] extends unknown[] ? (...args: T[K]) => void : never) : F);
 type Listener1<K, T> = Listener<K, T, (...args: any[]) => void>;
 declare class SimpleWebSocket<T extends Record<string, any[]> = {}> extends EventEmitter<ExtendDefaultEvents<T>> {
-    _socket: Socket | WebSocket | ReconnectingWebSocket;
-    constructor(address: string, options?: AutoReconnectOption, protocols?: string | string[]);
-    constructor(address: string | url.URL, options?: Options);
-    constructor(socket: Socket | WebSocket);
+    _socket: WebSocket | ReconnectingWebSocket;
+    constructor(address: string | URL, options?: Options, protocols?: string | string[]);
+    constructor(socket: WebSocket);
     constructor(socket: ReconnectingWebSocket);
     on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;
     addListener<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this;

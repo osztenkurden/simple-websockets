@@ -12,7 +12,7 @@ class SimpleWebSocketServer<T extends Record<string, any[]> = any> extends WebSo
         super(options, callback);
         this.connectionListeners = [];
         super.on('connection', (socket, request) => {
-            const simpleSocket = new SimpleWebSocket<T>(socket);
+            const simpleSocket = new SimpleWebSocket<T>(socket as unknown as WebSocket);
             this.connectionListeners.forEach(listener => {
                 listener(simpleSocket, request);
             });

@@ -1,8 +1,5 @@
-import Socket from 'ws';
 import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.js';
 import EventEmitter from 'events';
-import url from 'url';
-import http from 'http';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 type AddEventListener = <K extends 'message' | 'close' | 'error' | 'open'>(
@@ -11,10 +8,9 @@ type AddEventListener = <K extends 'message' | 'close' | 'error' | 'open'>(
 	options?: boolean | AddEventListenerOptions | undefined
 ) => void;
 
-type NativeOptions = Socket.ClientOptions | http.ClientRequestArgs;
 type AutoReconnectOption = { autoReconnect?: boolean };
 
-export type Options = NativeOptions & AutoReconnectOption;
+export type Options = AutoReconnectOption;
 export { getEnvironment, convertMessageToEvent, convertEventToMessage };
 
 type ExtendDefaultEvents<T extends Record<string | number | symbol, any[]>> = T & {
@@ -34,31 +30,20 @@ type Listener<K, T, F> = T extends DefaultEventMap ? F : (
 type Listener1<K, T> = Listener<K, T, (...args: any[]) => void>;
 
 export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends EventEmitter<ExtendDefaultEvents<T>> {
-	_socket: Socket | WebSocket | ReconnectingWebSocket;
+	_socket: WebSocket | ReconnectingWebSocket;
 
-	constructor(address: string, options?: AutoReconnectOption, protocols?: string | string[]);
-	constructor(address: string | url.URL, options?: Options);
-	constructor(socket: Socket | WebSocket);
+	constructor(address: string | URL, options?: Options, protocols?: string | string[]);
+	constructor(socket: WebSocket);
 	constructor(socket: ReconnectingWebSocket);
-	constructor(data: string | url.URL | Socket | WebSocket | ReconnectingWebSocket, options?: Options, protocols?: string | string[]) {
+	constructor(data: string | URL | WebSocket | ReconnectingWebSocket, options?: Options, protocols?: string | string[]) {
 		super();
-		this._socket = data as any;
+		this._socket = data as WebSocket | ReconnectingWebSocket;
 
-		const environment = getEnvironment();
-
-		if (typeof data === 'string') {
-			if (environment === 'browser') {
-				if (options?.autoReconnect) {
-					this._socket = new ReconnectingWebSocket(data, protocols, { ...(options || {}), WebSocket: WebSocket });
-				} else {
-					this._socket = new WebSocket(data, protocols);
-				}
+		if (typeof data === 'string' || data instanceof URL) {
+			if (options?.autoReconnect) {
+				this._socket = new ReconnectingWebSocket(data.toString(), protocols, { ...options, WebSocket: WebSocket });
 			} else {
-				if (options?.autoReconnect) {
-					this._socket = new ReconnectingWebSocket(data, protocols, { ...(options || {}), WebSocket: Socket });
-				} else {
-					this._socket = new Socket(data, options);
-				}
+				this._socket = new WebSocket(data, protocols);
 			}
 		}
 
@@ -74,7 +59,9 @@ export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends Event
 			(this.emit as any)('disconnect', data);
 		});
 		addEventListener("error", err => {
-			(this.emit as any)("error", err);
+			if ((this.listenerCount as (e: string) => number)('error') > 0) {
+				(this.emit as any)("error", err);
+			}
 		})
 	}
 	override on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {

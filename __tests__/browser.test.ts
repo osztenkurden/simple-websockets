@@ -1,7 +1,5 @@
 import { getEnvironment, SimpleWebSocket } from './../src/index.js';
 import { SimpleWebSocketServer } from '../src/server';
-import WebSocket from 'ws';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;

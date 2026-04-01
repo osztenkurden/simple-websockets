@@ -1,6 +1,6 @@
 {
 	"name": "simple-websockets",
-	"version": "2.1.0",
+	"version": "3.0.0",
 	"description": "",
 	"type": "module",
 	"main": "./lib/index.cjs",
@@ -27,6 +27,9 @@
 		"url": "git+https://github.com/osztenkurden/simple-websockets.git"
 	},
 	"author": "",
+	"engines": {
+		"node": ">=22"
+	},
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/osztenkurden/simple-websockets/issues"
