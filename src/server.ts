@@ -3,7 +3,7 @@ import http from 'http';
 import { SimpleWebSocket } from './';
 import { convertEventToMessage } from './util';
 
-type ListenerCallback = (socket: SimpleWebSocket<any>, request: http.IncomingMessage) => void;
+type ListenerCallback = (socket: SimpleWebSocket<any, ws>, request: http.IncomingMessage) => void;
 
 
 class SimpleWebSocketServer<T extends Record<string, any[]> = any> extends WebSocketServer {
@@ -12,13 +12,13 @@ class SimpleWebSocketServer<T extends Record<string, any[]> = any> extends WebSo
         super(options, callback);
         this.connectionListeners = [];
         super.on('connection', (socket, request) => {
-            const simpleSocket = new SimpleWebSocket<T>(socket as unknown as WebSocket);
+            const simpleSocket = SimpleWebSocket.fromWsSocket<T>(socket);
             this.connectionListeners.forEach(listener => {
                 listener(simpleSocket, request);
             });
         });
     }
-    onConnection(listener: (socket: SimpleWebSocket<T>, request: http.IncomingMessage) => void) {
+    onConnection(listener: (socket: SimpleWebSocket<T, ws>, request: http.IncomingMessage) => void) {
         this.connectionListeners.push(listener);
     }
     send(eventName: string, ...values: any[]) {
