@@ -1,6 +1,6 @@
 import ws, { WebSocketServer } from 'ws';
 import http from 'http';
-import { SimpleWebSocket, type Options } from './';
+import { SimpleWebSocket } from './';
 import { convertEventToMessage } from './util';
 
 type ListenerCallback = (socket: SimpleWebSocket<any>, request: http.IncomingMessage) => void;

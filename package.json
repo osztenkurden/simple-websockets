@@ -25,7 +25,7 @@
 		"lint": "eslint src/",
 		"format": "prettier --check src/",
 		"prepare": "husky",
-		"lint-format:fix": "prettier --config .prettierrc --write src/*.ts && eslint src/ --fix",
+		"format:fix": "prettier --config .prettierrc --write src/*.ts",
 		"test": "bun test:node && bun test:browser",
 		"test:node": "bun test --path-ignore-patterns '__tests__/browser.test.ts'",
 		"test:browser": "bun test --preload ./setup/browser.preload.ts __tests__/browser.test.ts"
