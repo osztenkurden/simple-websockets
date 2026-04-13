@@ -1,7 +1,6 @@
 import { getEnvironment, SimpleWebSocket } from './../src/index.js';
 import { SimpleWebSocketServer } from '../src/server';
-import WebSocket from 'ws';
-import ReconnectingWebSocket from 'reconnecting-websocket';
+import { beforeAll, jest, test, expect, afterAll } from 'bun:test';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
@@ -13,8 +12,10 @@ const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 beforeAll(done => {
 	server = new SimpleWebSocketServer({ port: 7698 }, () => {
 		socket = new SimpleWebSocket('ws://localhost:7698/');
+		socket._socket.binaryType = 'arraybuffer';
 		socket.on('connection', mockConnectionCallback);
 		socketWithWs = new SimpleWebSocket('ws://localhost:7698/', { autoReconnect: true });
+		socketWithWs._socket.binaryType = 'arraybuffer';
 		socketWithWs.on('connection', mockConnectionCallback);
 		delete (socketWithWs as any)._socket.on;
 		done();

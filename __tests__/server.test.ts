@@ -1,5 +1,6 @@
 import { SimpleWebSocket } from '../src';
 import { SimpleWebSocketServer } from '../src/server';
+import { beforeAll, jest, test, expect, afterAll } from 'bun:test';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
@@ -42,9 +43,9 @@ test('fire custom event listener to all sockets', async () => {
 	expect(eventCallback.mock.calls.length).toBe(2);
 
 	expect(eventCallback.mock.calls.length).toBe(2);
-	expect(eventCallback.mock.calls[0][0]).toBe(1);
-	expect(eventCallback.mock.calls[0][1]).toBe('two');
-	expect(eventCallback.mock.calls[0][2]).toBe('3');
+	expect(eventCallback.mock.calls[0]?.[0]).toBe(1);
+	expect(eventCallback.mock.calls[0]?.[1]).toBe('two');
+	expect(eventCallback.mock.calls[0]?.[2]).toBe('3');
 });
 
 test('fire close event', async () => {

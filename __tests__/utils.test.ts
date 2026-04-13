@@ -1,5 +1,5 @@
 import { convertMessageToEvent, convertEventToMessage, getEnvironment } from './../src/index';
-
+import { test, expect } from 'bun:test';
 test('utils > properly convert message to event', () => {
 	const event = convertMessageToEvent('{ "eventName": "test event name", "values": [12, "arg2", 420]}');
 

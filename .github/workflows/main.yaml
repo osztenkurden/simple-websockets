@@ -1,14 +1,13 @@
-name: CI
+name: Tests
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
+    branches: [master]
+
 
 jobs:
   build:
-
+    name: "Lint, Typecheck & Test on Node ${{ matrix.node-version }}"
     runs-on: ubuntu-latest
 
     strategy:
@@ -16,10 +15,14 @@ jobs:
         node-version: [22.x, 24.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v6
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm test
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+    - run: bun i
+    - run: bun run lint
+    - run: bun run typecheck
+    - run: bun run test

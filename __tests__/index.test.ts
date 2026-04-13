@@ -1,5 +1,6 @@
 import { SimpleWebSocket } from './../src';
 import { SimpleWebSocketServer } from '../src/server';
+import { beforeAll, jest, test, expect, afterAll } from 'bun:test';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
@@ -12,11 +13,14 @@ const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 beforeAll(done => {
 	server = new SimpleWebSocketServer({ port: 7689 }, () => {
 		socket = new SimpleWebSocket('ws://localhost:7689/');
+		socket._socket.binaryType = 'arraybuffer';
 		socket.on('connection', mockConnectionCallback);
 		socketToError = new SimpleWebSocket('ws://localhost:7689/');
 		socketToError.on('connection', mockConnectionCallback);
+		socketToError._socket.binaryType = 'arraybuffer';
 		socketWithWs = new SimpleWebSocket('ws://localhost:7689/', { autoReconnect: true });
 		socketWithWs.on('connection', mockConnectionCallback);
+		socketWithWs._socket.binaryType = 'arraybuffer';
 		done();
 	});
 });
@@ -190,9 +194,9 @@ test('SimpleWebSocket > gets data correctly', async () => {
 
 	await wait(300);
 
-	expect(eventCallback.mock.calls[0][0]).toBe(1);
-	expect(eventCallback.mock.calls[0][1]).toBe(2);
-	expect(eventCallback.mock.calls[0][2]).toBe(3);
+	expect(eventCallback.mock.calls[0]?.[0]).toBe(1);
+	expect(eventCallback.mock.calls[0]?.[1]).toBe(2);
+	expect(eventCallback.mock.calls[0]?.[2]).toBe(3);
 });
 
 test('SimpleWebSocket > handle disconnect gracefully', async () => {
@@ -208,13 +212,4 @@ test('SimpleWebSocket > handle disconnect gracefully', async () => {
 
 test('SimpleWebSocket > dont throw when not connected', () => {
 	expect(socket.send(':)')).toBe(false);
-});
-
-afterAll(done => {
-	server.clients.forEach(socket => {
-		socket.close();
-	});
-	server.close(() => {
-		done();
-	});
 });
