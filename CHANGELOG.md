@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/osztenkurden/simple-websockets/compare/v2.1.1...v2.2.0) (2026-04-13)
+
+
+### Features
+
+* fixed build process ([fc2366f](https://github.com/osztenkurden/simple-websockets/commit/fc2366f17fccbda3e76261a846b38ec67a70390b))
+
 ## 2.1.1 (2026-04-13)
 
 
