@@ -1,5 +1,5 @@
 import Socket from 'ws';
-import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.js';
+import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.ts';
 import EventEmitter from 'events';
 import url from 'url';
 import http from 'http';

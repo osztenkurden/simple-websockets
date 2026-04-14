@@ -1,69 +1,79 @@
-import { getEnvironment, SimpleWebSocket } from './../src/index.js';
-import { SimpleWebSocketServer } from '../src/server';
-import { beforeAll, jest, test, expect, afterAll } from 'bun:test';
+import '../setup/browser.preload.ts';
+import { getEnvironment, SimpleWebSocket } from './../src/index.ts';
+import { SimpleWebSocketServer } from '../src/server.ts';
+import { before, after, test, mock } from 'node:test';
+import assert from 'node:assert/strict';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
 let socketWithWs: SimpleWebSocket;
 
-const mockConnectionCallback = jest.fn();
+const mockConnectionCallback = mock.fn();
 
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
-beforeAll(done => {
-	server = new SimpleWebSocketServer({ port: 7698 }, () => {
-		socket = new SimpleWebSocket('ws://localhost:7698/');
-		socket._socket.binaryType = 'arraybuffer';
-		socket.on('connection', mockConnectionCallback);
-		socketWithWs = new SimpleWebSocket('ws://localhost:7698/', { autoReconnect: true });
-		socketWithWs._socket.binaryType = 'arraybuffer';
-		socketWithWs.on('connection', mockConnectionCallback);
-		delete (socketWithWs as any)._socket.on;
-		done();
-	});
-});
+before(
+	() =>
+		new Promise<void>(resolve => {
+			server = new SimpleWebSocketServer({ port: 7698 }, () => {
+				socket = new SimpleWebSocket('ws://localhost:7698/');
+				socket._socket.binaryType = 'arraybuffer';
+				socket.on('connection', mockConnectionCallback);
+				socketWithWs = new SimpleWebSocket('ws://localhost:7698/', { autoReconnect: true });
+				socketWithWs._socket.binaryType = 'arraybuffer';
+				socketWithWs.on('connection', mockConnectionCallback);
+				delete (socketWithWs as any)._socket.on;
+				resolve();
+			});
+		})
+);
 
 test('util > detect browser environment', () => {
-	expect(getEnvironment()).toBe('browser');
+	assert.strictEqual(getEnvironment(), 'browser');
 });
 test('SimpleWebSocket > create an instance', () => {
-	expect(socketWithWs).toBeInstanceOf(SimpleWebSocket);
+	assert.ok(socketWithWs instanceof SimpleWebSocket);
 });
 test('SimpleWebSocket > register listener', async () => {
 	await wait(500);
 
-	expect(mockConnectionCallback.mock.calls.length).toBe(2);
+	assert.strictEqual(mockConnectionCallback.mock.calls.length, 2);
 });
 test('SimpleWebSocket > register listener', () => {
-	expect(async () => {
+	assert.doesNotThrow(() => {
 		server.send('unregistered event');
 		server.clients.forEach(socket => {
 			socket.send('');
 		});
-		await wait(500);
-	}).not.toThrow();
+	});
 });
 
 test('SimpleWebSocket > sends data to server', () => {
-	expect(socketWithWs.send('test event')).toBe(true);
+	assert.strictEqual(socketWithWs.send('test event'), true);
 });
 
 test('SimpleWebSocket > handle disconnect gracefully', async () => {
-	const mockCloseCallback = jest.fn();
+	const mockCloseCallback = mock.fn();
 	socket.on('disconnect', mockCloseCallback);
 	socketWithWs.on('disconnect', mockCloseCallback);
 	socket._socket.close();
 	socketWithWs._socket.close();
 	await wait(500);
 
-	expect(mockCloseCallback.mock.calls.length).toBe(2);
+	assert.strictEqual(mockCloseCallback.mock.calls.length, 2);
 });
 
 test('SimpleWebSocket > dont throw when not connected', () => {
-	expect(socketWithWs.send(':)')).toBe(false);
+	assert.strictEqual(socketWithWs.send(':)'), false);
 });
 
-afterAll(done => {
-	server.close(() => {
-		done();
-	});
-});
+after(
+	() =>
+		new Promise<void>(resolve => {
+			server.clients.forEach(socket => {
+				socket.close();
+			});
+			server.close(() => {
+				resolve();
+			});
+		})
+);

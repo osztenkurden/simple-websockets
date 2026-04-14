@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"types": ["node", "bun-types"],
+		"types": ["node"],
 		/* Base Options: */
 		"esModuleInterop": true,
 		"skipLibCheck": true,
@@ -10,6 +10,7 @@
 		"moduleDetection": "force",
 		"isolatedModules": true,
 		"rootDir": ".",
+		"allowImportingTsExtensions": true,
 		"verbatimModuleSyntax": true,
 		/* Strictness */
 		"strict": true,
@@ -20,7 +21,7 @@
 		"noEmit": true,
 		"outDir": "dist",
 		/* If your code doesn't run in the DOM: */
-		"lib": ["es2024", "DOM"]
+		"lib": ["es2022", "DOM"]
 	},
 	"exclude": ["dist"]
 }
