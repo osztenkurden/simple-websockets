@@ -1,6 +1,6 @@
 {
 	"name": "simple-websockets",
-	"version": "2.2.2",
+	"version": "3.0.0",
 	"description": "",
 	"type": "module",
 	"types": "./dist/index.d.mts",

@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/osztenkurden/simple-websockets/compare/v2.2.2...v3.0.0) (2026-04-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* start using native websocket for node ([#12](https://github.com/osztenkurden/simple-websockets/issues/12))
+
+### Features
+
+* start using native websocket for node ([#12](https://github.com/osztenkurden/simple-websockets/issues/12)) ([6462966](https://github.com/osztenkurden/simple-websockets/commit/6462966f749c9696e99168a064fa4a30d2ec8300))
+
 ## [2.2.2](https://github.com/osztenkurden/simple-websockets/compare/v2.2.1...v2.2.2) (2026-04-14)
 
 
