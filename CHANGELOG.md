@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/osztenkurden/simple-websockets/compare/v2.2.0...v2.2.1) (2026-04-14)
+
+
+### Bug Fixes
+
+* moved test runners to node ([1b574c5](https://github.com/osztenkurden/simple-websockets/commit/1b574c5cb8974eec3791fec56633859b0332611e))
+
 ## [2.2.0](https://github.com/osztenkurden/simple-websockets/compare/v2.1.1...v2.2.0) (2026-04-13)
 
 
