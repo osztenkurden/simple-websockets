@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/osztenkurden/simple-websockets/compare/v2.2.1...v2.2.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* lock ([09b8530](https://github.com/osztenkurden/simple-websockets/commit/09b8530feca395043c44370c2a72983b67191335))
+
 ## [2.2.1](https://github.com/osztenkurden/simple-websockets/compare/v2.2.0...v2.2.1) (2026-04-14)
 
 
