@@ -3,23 +3,17 @@
 	"version": "2.2.1",
 	"description": "",
 	"type": "module",
-	"main": "./dist/index.cjs",
-	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
 	"exports": {
-		".": {
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.cjs"
-		},
-		"./server": {
-			"import": "./dist/server.mjs",
-			"require": "./dist/server.cjs"
-		}
+		".": "./dist/index.mjs",
+		"./server": "./dist/server.mjs",
+		"./package.json": "./package.json"
 	},
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "tsdown src/index.ts src/server.ts --format cjs,esm --dts -d dist",
+		"build": "tsdown src/index.ts src/server.ts",
 		"typecheck": "tsc && eslint .",
 		"lint": "eslint src/",
 		"format": "prettier --check ./**/*.ts",
