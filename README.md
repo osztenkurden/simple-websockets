@@ -1,4 +1,3 @@
-![Statements](https://img.shields.io/badge/statements-98.82%25-brightgreen.svg?style=flat)
 ![CI](https://img.shields.io/github/actions/workflow/status/osztenkurden/simple-websockets/.github/workflows/main.yaml?branch=master)
 ![Dependencies](https://img.shields.io/librariesio/github/osztenkurden/simple-websockets)
 ![Downloads](https://img.shields.io/npm/dm/simple-websockets)
@@ -6,20 +5,22 @@
 
 # Simple Websockets
 
-## What is it for?
+> Requires **Node.js >= 22**
 
-It's super easy, super thin client package for event systems in WebSockets to work with `simple-websockets/server` (inspired by socket.io but with no bloat).
+Super easy, super thin event-based WebSocket wrapper to work with `simple-websockets/server` (inspired by socket.io but with no bloat).
+
+As of v3, the client uses the native global `WebSocket` available in both browsers and Node.js 22+, removing the need for the `ws` library on the client side.
 
 # Client
 
-## API example #1 - browser & node
+## Basic usage
 
-```javascript
+```typescript
 import { SimpleWebSocket } from 'simple-websockets';
 
 const socket = new SimpleWebSocket('ws://localhost:123');
 
-socket._socket; // Instance of native WebSocket in browser, or ws in node
+socket._socket; // Instance of native WebSocket
 
 socket.on('event name', (arg1, arg2, arg3) => {
 	// Listen for custom event from server
@@ -28,9 +29,9 @@ socket.on('event name', (arg1, arg2, arg3) => {
 socket.send('event name to send to server', 1, 2, 3, 'fourth argument');
 ```
 
-## API example #2 - browser
+## Wrapping an existing WebSocket
 
-```javascript
+```typescript
 import { SimpleWebSocket } from 'simple-websockets';
 
 const webSocket = new WebSocket('ws://localhost:123');
@@ -38,22 +39,66 @@ const webSocket = new WebSocket('ws://localhost:123');
 const socket = new SimpleWebSocket(webSocket);
 ```
 
-## API example #3 - node
+## Wrapping a `ws` socket
 
-```javascript
+If you have a `ws` library socket (e.g. from a server connection callback), you can wrap it too:
+
+```typescript
 import { SimpleWebSocket } from 'simple-websockets';
 import WebSocket from 'ws';
 
-const webSocket = new WebSocket('ws://localhost:123');
+const wsSocket = new WebSocket('ws://localhost:123');
 
-const socket = new SimpleWebSocket(webSocket);
+const socket = new SimpleWebSocket(wsSocket);
+```
+
+## Auto-reconnect
+
+Pass `{ autoReconnect: true }` to automatically reconnect on disconnection (uses `reconnecting-websocket` under the hood):
+
+```typescript
+const socket = new SimpleWebSocket('ws://localhost:123', { autoReconnect: true });
+```
+
+## Static factory methods
+
+For precise type inference on `_socket`, use the static factory methods:
+
+```typescript
+// From a URL string or URL object
+const socket = SimpleWebSocket.fromAddress('ws://localhost:123');
+const reconnecting = SimpleWebSocket.fromAddress('ws://localhost:123', { autoReconnect: true });
+
+// From an existing native WebSocket
+const socket = SimpleWebSocket.fromWebSocket(existingWebSocket);
+
+// From a ws library socket
+const socket = SimpleWebSocket.fromWsSocket(wsSocket);
+
+// From a ReconnectingWebSocket
+const socket = SimpleWebSocket.fromReconnecting(existingReconnectingSocket);
+```
+
+## Type-safe events
+
+```typescript
+type MyEvents = {
+	'chat message': [message: string, sender: string];
+	'user joined': [username: string];
+};
+
+const socket = new SimpleWebSocket<MyEvents>('ws://localhost:123');
+
+socket.on('chat message', (message, sender) => {
+	// message: string, sender: string
+});
+
+socket.send('chat message', 'hello', 'alice');
 ```
 
 ## Documentation
 
-To constructor you can pass the same options as for `ws` (node) or `WebSocket` (browser) or the sockets themselves.
-
-`socket.send` sends to server stringified JSON object
+`socket.send` sends to server a stringified JSON object:
 
 ```javascript
 {
@@ -62,17 +107,17 @@ To constructor you can pass the same options as for `ws` (node) or `WebSocket` (
 }
 ```
 
-where `values` is the array of arguments after first argument of `send` method.
+where `values` is the array of arguments after the first argument of the `send` method.
 
-`socket.on` listens for incoming data that fits the scheme and calls listener.
+`socket.on` listens for incoming data that fits the scheme and calls the listener.
 
 You can send events without values.
 
-Event name must be non-empty string.
+Event name must be a non-empty string.
 
-By default socket calls `connection` and `disconnect` events on its own (without any arguments)
+By default, the socket emits `connection` and `disconnect` events on its own.
 
-This package is for now considered feature-complete - probably will not add any features, only bugfixes.
+This package is considered feature-complete - probably will not add any features, only bugfixes.
 
 # Server
 
@@ -83,8 +128,8 @@ import { SimpleWebSocketServer } from 'simple-websockets/server';
 
 const server = new SimpleWebSocketServer({ port: 1234 });
 
-server.onConnection((socket: SimpleWebSocket, request: http.IncomingRequest) => {
-	socket.on('some event from socket', someData => {
+server.onConnection((socket, request) => {
+	socket.on('some event from socket', (someData) => {
 		socket.send('some response', someResponseData);
 	});
 });
@@ -94,12 +139,12 @@ server.send('event name to send to all clients', 1, 2, 3, 'fourth argument');
 
 ## Documentation
 
-SimpleWebSocketServer extends from `ws.Server`, so constructor is precisely the same. SimpleWebSocketServer has 2 additional methods:
+`SimpleWebSocketServer` extends `ws.WebSocketServer`, so the constructor accepts the same options. It has 2 additional methods:
 
--   onConnection(socket => void) - connection listener. `socket` is an instance of SimpleWebSocket
--   send(eventName, data) - sends event and specified data to all connected sockets
+-   `onConnection(callback)` - connection listener. The callback receives a `SimpleWebSocket` instance and the `http.IncomingMessage` request
+-   `send(eventName, ...values)` - sends an event with data to all connected sockets
 
-`server.send` sends to server stringified JSON object
+`server.send` sends to all clients a stringified JSON object:
 
 ```javascript
 {
@@ -108,10 +153,10 @@ SimpleWebSocketServer extends from `ws.Server`, so constructor is precisely the 
 }
 ```
 
-where `values` is the array of arguments after first argument of `send` method.
+where `values` is the array of arguments after the first argument of the `send` method.
 
-`socket.on` listens for incoming data that fits the object and calls listener.
+`socket.on` listens for incoming data that fits the scheme and calls the listener.
 
 You can send events without values.
 
-Event name must be non-empty string.
+Event name must be a non-empty string.

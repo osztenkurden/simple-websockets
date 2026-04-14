@@ -1,8 +1,6 @@
-import Socket from 'ws';
 import { getEnvironment, convertEventToMessage, convertMessageToEvent } from './util.ts';
 import EventEmitter from 'events';
-import url from 'url';
-import http from 'http';
+import type WsWebSocket from 'ws';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 type AddEventListener = <K extends 'message' | 'close' | 'error' | 'open'>(
@@ -11,10 +9,9 @@ type AddEventListener = <K extends 'message' | 'close' | 'error' | 'open'>(
 	options?: boolean | AddEventListenerOptions | undefined
 ) => void;
 
-type NativeOptions = Socket.ClientOptions | http.ClientRequestArgs;
 type AutoReconnectOption = { autoReconnect?: boolean };
 
-export type Options = NativeOptions & AutoReconnectOption;
+export type Options = AutoReconnectOption;
 export { getEnvironment, convertMessageToEvent, convertEventToMessage };
 
 type ExtendDefaultEvents<T extends Record<string | number | symbol, any[]>> = T & {
@@ -34,42 +31,39 @@ type Listener<K, T, F> = T extends DefaultEventMap
 		: F;
 type Listener1<K, T> = Listener<K, T, (...args: any[]) => void>;
 
-export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends EventEmitter<ExtendDefaultEvents<T>> {
-	_socket: Socket | WebSocket | ReconnectingWebSocket;
+type AvailableInputs = string | URL | WebSocket | ReconnectingWebSocket | WsWebSocket;
+type OutputSocket<T extends AvailableInputs, B extends boolean> = T extends string
+	? B extends true
+		? ReconnectingWebSocket
+		: WebSocket
+	: T extends URL
+		? B extends true
+			? ReconnectingWebSocket
+			: WebSocket
+		: T;
+export class SimpleWebSocket<
+	T extends Record<string, any[]> = {},
+	W extends AvailableInputs = '',
+	B extends boolean = false // <-- new generic for autoReconnect
+> extends EventEmitter<ExtendDefaultEvents<T>> {
+	_socket: OutputSocket<W, B>; // <-- now properly typed
 
-	constructor(address: string, options?: AutoReconnectOption, protocols?: string | string[]);
-	constructor(address: string | url.URL, options?: Options);
-	constructor(socket: Socket | WebSocket);
+	constructor(address: string | URL, options?: Options, protocols?: string | string[]);
+	constructor(socket: WsWebSocket);
+	constructor(socket: WebSocket);
 	constructor(socket: ReconnectingWebSocket);
-	constructor(
-		data: string | url.URL | Socket | WebSocket | ReconnectingWebSocket,
-		options?: Options,
-		protocols?: string | string[]
-	) {
+	constructor(data: W, options?: Options, protocols?: string | string[]) {
 		super();
 		this._socket = data as any;
 
-		const environment = getEnvironment();
-
-		if (typeof data === 'string') {
-			if (environment === 'browser') {
-				if (options?.autoReconnect) {
-					this._socket = new ReconnectingWebSocket(data, protocols, {
-						...(options || {}),
-						WebSocket: WebSocket
-					});
-				} else {
-					this._socket = new WebSocket(data, protocols);
-				}
+		if (typeof data === 'string' || data instanceof URL) {
+			if (options?.autoReconnect) {
+				this._socket = new ReconnectingWebSocket(data.toString(), protocols, {
+					...options,
+					WebSocket: WebSocket
+				}) as OutputSocket<typeof data, boolean>;
 			} else {
-				if (options?.autoReconnect) {
-					this._socket = new ReconnectingWebSocket(data, protocols, {
-						...(options || {}),
-						WebSocket: Socket
-					});
-				} else {
-					this._socket = new Socket(data, options);
-				}
+				this._socket = new WebSocket(data, protocols) as OutputSocket<typeof data, boolean>;
 			}
 		}
 
@@ -85,7 +79,9 @@ export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends Event
 			(this.emit as any)('disconnect', data);
 		});
 		addEventListener('error', err => {
-			(this.emit as any)('error', err);
+			if ((this.listenerCount as (e: string) => number)('error') > 0) {
+				(this.emit as any)('error', err);
+			}
 		});
 	}
 	override on<K>(eventName: Key<K, ExtendDefaultEvents<T>>, listener: Listener1<K, ExtendDefaultEvents<T>>): this {
@@ -143,4 +139,35 @@ export class SimpleWebSocket<T extends Record<string, any[]> = {}> extends Event
 		if (!dataObject) return;
 		return this.emit(dataObject.eventName as any, ...(dataObject.values as any));
 	};
+	static fromAddress<T extends Record<string, any[]>>(
+		address: string | URL,
+		options: Options & { autoReconnect: true },
+		protocols?: string | string[]
+	): SimpleWebSocket<T, string, true>;
+	static fromAddress<T extends Record<string, any[]>>(
+		address: string | URL,
+		options?: Options,
+		protocols?: string | string[]
+	): SimpleWebSocket<T, string, false>;
+	static fromAddress(
+		address: string | URL,
+		options?: Options,
+		protocols?: string | string[]
+	): SimpleWebSocket<{}, string, boolean> {
+		return new SimpleWebSocket(address, options, protocols);
+	}
+
+	static fromWsSocket<T extends Record<string, any[]>>(socket: WsWebSocket): SimpleWebSocket<T, WsWebSocket> {
+		return new SimpleWebSocket(socket);
+	}
+
+	static fromWebSocket<T extends Record<string, any[]>>(socket: WebSocket): SimpleWebSocket<T, WebSocket> {
+		return new SimpleWebSocket(socket);
+	}
+
+	static fromReconnecting<T extends Record<string, any[]>>(
+		socket: ReconnectingWebSocket
+	): SimpleWebSocket<T, ReconnectingWebSocket> {
+		return new SimpleWebSocket(socket);
+	}
 }
