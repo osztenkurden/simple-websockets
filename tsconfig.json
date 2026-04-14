@@ -1,23 +1,27 @@
 {
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "target": "es2022",
-    "verbatimModuleSyntax": true,
-    "allowJs": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "moduleResolution": "Bundler",
-    "module": "ESNext",
-    "noEmit": true,
-    "lib": [
-      "es2022",
-      "dom",
-      "dom.iterable"
-    ]
-  }
+	"compilerOptions": {
+		"types": ["node"],
+		/* Base Options: */
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"target": "es2022",
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"moduleDetection": "force",
+		"isolatedModules": true,
+		"rootDir": ".",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		/* Strictness */
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noImplicitOverride": true,
+		/* If NOT transpiling with TypeScript: */
+		"module": "preserve",
+		"noEmit": true,
+		"outDir": "dist",
+		/* If your code doesn't run in the DOM: */
+		"lib": ["es2022", "DOM"]
+	},
+	"exclude": ["dist"]
 }

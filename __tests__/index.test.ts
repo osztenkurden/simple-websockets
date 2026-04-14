@@ -1,46 +1,53 @@
-import { SimpleWebSocket } from './../src';
-import { SimpleWebSocketServer } from '../src/server';
+import { SimpleWebSocket } from './../src/index.ts';
+import { SimpleWebSocketServer } from '../src/server.ts';
+import { before, test, mock, after } from 'node:test';
+import assert from 'node:assert/strict';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
 let socketToError: SimpleWebSocket;
 let socketWithWs: SimpleWebSocket;
 
-const mockConnectionCallback = jest.fn();
+const mockConnectionCallback = mock.fn();
 
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
-beforeAll(done => {
-	server = new SimpleWebSocketServer({ port: 7689 }, () => {
-		socket = new SimpleWebSocket('ws://localhost:7689/');
-		socket.on('connection', mockConnectionCallback);
-		socketToError = new SimpleWebSocket('ws://localhost:7689/');
-		socketToError.on('connection', mockConnectionCallback);
-		socketWithWs = new SimpleWebSocket('ws://localhost:7689/', { autoReconnect: true });
-		socketWithWs.on('connection', mockConnectionCallback);
-		done();
-	});
-});
+before(
+	() =>
+		new Promise<void>(resolve => {
+			server = new SimpleWebSocketServer({ port: 7689 }, () => {
+				socket = new SimpleWebSocket('ws://localhost:7689/');
+				socket._socket.binaryType = 'arraybuffer';
+				socket.on('connection', mockConnectionCallback);
+				socketToError = new SimpleWebSocket('ws://localhost:7689/');
+				socketToError.on('connection', mockConnectionCallback);
+				socketToError._socket.binaryType = 'arraybuffer';
+				socketWithWs = new SimpleWebSocket('ws://localhost:7689/', { autoReconnect: true });
+				socketWithWs.on('connection', mockConnectionCallback);
+				socketWithWs._socket.binaryType = 'arraybuffer';
+				resolve();
+			});
+		})
+);
 test('SimpleWebSocket > create an instance', () => {
-	expect(socket).toBeInstanceOf(SimpleWebSocket);
+	assert.ok(socket instanceof SimpleWebSocket);
 });
 test('SimpleWebSocket > register listener', async () => {
 	await wait(300);
 
-	expect(mockConnectionCallback.mock.calls.length).toBe(3);
+	assert.strictEqual(mockConnectionCallback.mock.calls.length, 3);
 });
 test('SimpleWebSocket > register listener', () => {
-	expect(async () => {
+	assert.doesNotThrow(() => {
 		server.send('unregistered event');
-		await wait(500);
-	}).not.toThrow();
+	});
 });
 
 test('SimpleWebSocket > sends data to server', () => {
-	expect(socket.send('test event')).toBe(true);
+	assert.strictEqual(socket.send('test event'), true);
 });
 
 test('event listener > gets event names', () => {
-	const callback = jest.fn(() => {});
+	const callback = mock.fn(() => {});
 	socket.addListener('mvp', callback);
 
 	socket.on('matchEnd', callback);
@@ -54,10 +61,10 @@ test('event listener > gets event names', () => {
 
 	const eventNames = socket.eventNames();
 
-	expect(eventNames.includes('mvp')).toBe(true);
-	expect(eventNames.includes('matchEnd')).toBe(true);
-	expect(eventNames.includes('roundEnd')).toBe(true);
-	expect(eventNames.length).toBe(4);
+	assert.ok(eventNames.includes('mvp'));
+	assert.ok(eventNames.includes('matchEnd'));
+	assert.ok(eventNames.includes('roundEnd'));
+	assert.strictEqual(eventNames.length, 4);
 });
 
 test('event listener > gets max listeners', () => {
@@ -69,37 +76,37 @@ test('event listener > gets max listeners', () => {
 
 	socket.setMaxListeners(newMax);
 
-	expect(socket.getMaxListeners()).toBe(newMax);
+	assert.strictEqual(socket.getMaxListeners(), newMax);
 });
 
 test('event listener > gets listener count', () => {
-	const callback = jest.fn(() => {});
+	const callback = mock.fn(() => {});
 
 	socket.on('defuseStartRandomName', callback);
 
-	expect(socket.listenerCount('defuseStartRandomName')).toBe(1);
-	expect(socket.listenerCount('mvpRandomName')).toBe(0);
+	assert.strictEqual(socket.listenerCount('defuseStartRandomName'), 1);
+	assert.strictEqual(socket.listenerCount('mvpRandomName'), 0);
 });
 
 test('event listener > gets descriptors', () => {
-	const callback = jest.fn(() => {});
+	const callback = mock.fn(() => {});
 
 	socket.on('defuseStartRandomName2', callback);
 	socket.on('defuseStartRandomName2', callback);
 
-	expect(socket.rawListeners('defuseStartRandomName2').length).toBe(2);
-	expect(socket.rawListeners('mvpRandomName2').length).toBe(0);
+	assert.strictEqual(socket.rawListeners('defuseStartRandomName2').length, 2);
+	assert.strictEqual(socket.rawListeners('mvpRandomName2').length, 0);
 });
 
 test('event listener > calls once listeners only once', () => {
-	const callback = jest.fn(() => {});
+	const callback = mock.fn(() => {});
 
 	socket.once('defuseStart', callback);
 	socket.emit('defuseStart');
 	socket.emit('defuseStart');
 	socket.emit('defuseStart');
 
-	expect(callback.mock.calls.length).toBe(1);
+	assert.strictEqual(callback.mock.calls.length, 1);
 });
 
 test('event listener > prepend listener', () => {
@@ -114,7 +121,7 @@ test('event listener > prepend listener', () => {
 			i = 2;
 		}
 	};
-	const callback = jest.fn(() => {});
+	const callback = mock.fn(() => {});
 
 	socket.on('defuseStart', callbackOne);
 
@@ -124,8 +131,8 @@ test('event listener > prepend listener', () => {
 	socket.emit('defuseStart');
 	socket.emit('defuseStop');
 
-	expect(i).toBe(2);
-	expect(callback.mock.calls.length).toBe(1);
+	assert.strictEqual(i, 2);
+	assert.strictEqual(callback.mock.calls.length, 1);
 });
 test('event listener > prepend once listener', () => {
 	let i = 0;
@@ -139,7 +146,7 @@ test('event listener > prepend once listener', () => {
 			i = 2;
 		}
 	};
-	const callback = jest.fn(() => {});
+	const callback = mock.fn(() => {});
 
 	socket.prependOnceListener('defuseStart2', callbackOne);
 
@@ -149,12 +156,12 @@ test('event listener > prepend once listener', () => {
 	socket.emit('defuseStart2');
 	socket.emit('defuseStop2');
 
-	expect(i).toBe(2);
-	expect(callback.mock.calls.length).toBe(1);
+	assert.strictEqual(i, 2);
+	assert.strictEqual(callback.mock.calls.length, 1);
 });
 
 test('event listener > remove all listeners from specific event', () => {
-	const callback = jest.fn(() => {});
+	const callback = mock.fn(() => {});
 	socket.on('datainc', callback);
 	socket.removeAllListeners('datainc');
 	socket.removeAllListeners('datainc2');
@@ -162,7 +169,7 @@ test('event listener > remove all listeners from specific event', () => {
 	socket.emit('datainc');
 	socket.emit('datainc2');
 
-	expect(callback.mock.calls.length).toBe(0);
+	assert.strictEqual(callback.mock.calls.length, 0);
 });
 /*
 test("SimpleWebSocket > fails when unconnected", () => {
@@ -172,49 +179,53 @@ test("SimpleWebSocket > fails when unconnected", () => {
     expect(result).toBe(false);
 
 });*/
-test('SimpleWebSocket > handles bad data gracefully', () => {
-	expect(async () => {
+test('SimpleWebSocket > handles bad data gracefully', async () => {
+	assert.doesNotThrow(() => {
 		server.clients.forEach(socket => {
 			socket.send('absolutely random data');
 		});
+	});
 
-		await wait(300);
-	}).not.toThrow();
+	await wait(300);
 });
 
 test('SimpleWebSocket > gets data correctly', async () => {
-	const eventCallback = jest.fn();
+	const eventCallback = mock.fn();
 	socket.on('event', eventCallback);
 
 	server.send('event', 1, 2, 3);
 
 	await wait(300);
 
-	expect(eventCallback.mock.calls[0][0]).toBe(1);
-	expect(eventCallback.mock.calls[0][1]).toBe(2);
-	expect(eventCallback.mock.calls[0][2]).toBe(3);
+	assert.strictEqual(eventCallback.mock.calls[0]?.arguments[0], 1);
+	assert.strictEqual(eventCallback.mock.calls[0]?.arguments[1], 2);
+	assert.strictEqual(eventCallback.mock.calls[0]?.arguments[2], 3);
 });
 
 test('SimpleWebSocket > handle disconnect gracefully', async () => {
-	const mockCloseCallback = jest.fn();
+	const mockCloseCallback = mock.fn();
 	socket.on('disconnect', mockCloseCallback);
 	socketWithWs.on('disconnect', mockCloseCallback);
 	socket._socket.close();
 	socketWithWs._socket.close();
 	await wait(300);
 
-	expect(mockCloseCallback.mock.calls.length).toBe(2);
+	assert.strictEqual(mockCloseCallback.mock.calls.length, 2);
 });
 
 test('SimpleWebSocket > dont throw when not connected', () => {
-	expect(socket.send(':)')).toBe(false);
+	assert.strictEqual(socket.send(':)'), false);
 });
 
-afterAll(done => {
-	server.clients.forEach(socket => {
-		socket.close();
-	});
-	server.close(() => {
-		done();
-	});
-});
+after(
+	() =>
+		new Promise<void>(resolve => {
+			server.clients.forEach(socket => {
+				socket.close();
+			});
+			server.close(() => {
+				socket._socket.close();
+				resolve();
+			});
+		})
+);

@@ -1,4 +1,3 @@
-![Statements](https://img.shields.io/badge/statements-95.12%25-brightgreen.svg?style=flat)
 ![CI](https://img.shields.io/github/actions/workflow/status/osztenkurden/simple-websockets/.github/workflows/main.yaml?branch=master)
 ![Dependencies](https://img.shields.io/librariesio/github/osztenkurden/simple-websockets)
 ![Downloads](https://img.shields.io/npm/dm/simple-websockets)

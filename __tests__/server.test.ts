@@ -1,5 +1,7 @@
-import { SimpleWebSocket } from '../src';
-import { SimpleWebSocketServer } from '../src/server';
+import { SimpleWebSocket } from '../src/index.ts';
+import { SimpleWebSocketServer } from '../src/server.ts';
+import { test, mock } from 'node:test';
+import assert from 'node:assert/strict';
 
 let server: SimpleWebSocketServer;
 let socket: SimpleWebSocket;
@@ -8,14 +10,14 @@ let socket2: SimpleWebSocket;
 const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
 
 test('create server instance', () => {
-	expect(() => {
+	assert.doesNotThrow(() => {
 		server = new SimpleWebSocketServer({ port: 1234 });
-		expect(server).toBeInstanceOf(SimpleWebSocketServer);
-	}).not.toThrow();
+		assert.ok(server instanceof SimpleWebSocketServer);
+	});
 });
 
 test('fire connection listener', async () => {
-	const onConnectMock = jest.fn();
+	const onConnectMock = mock.fn();
 
 	server.onConnection(onConnectMock);
 
@@ -23,12 +25,12 @@ test('fire connection listener', async () => {
 
 	await wait(300);
 
-	expect(onConnectMock.mock.calls.length).toBe(1);
-	expect(socket._socket.readyState).toBe(1);
+	assert.strictEqual(onConnectMock.mock.calls.length, 1);
+	assert.strictEqual(socket._socket.readyState, 1);
 });
 
 test('fire custom event listener to all sockets', async () => {
-	const eventCallback = jest.fn();
+	const eventCallback = mock.fn();
 	socket2 = new SimpleWebSocket('ws://localhost:1234');
 	await wait(300);
 
@@ -39,16 +41,16 @@ test('fire custom event listener to all sockets', async () => {
 	socket.send('event', 1, 2, 3);
 
 	await wait(300);
-	expect(eventCallback.mock.calls.length).toBe(2);
+	assert.strictEqual(eventCallback.mock.calls.length, 2);
 
-	expect(eventCallback.mock.calls.length).toBe(2);
-	expect(eventCallback.mock.calls[0][0]).toBe(1);
-	expect(eventCallback.mock.calls[0][1]).toBe('two');
-	expect(eventCallback.mock.calls[0][2]).toBe('3');
+	assert.strictEqual(eventCallback.mock.calls.length, 2);
+	assert.strictEqual(eventCallback.mock.calls[0]?.arguments[0], 1);
+	assert.strictEqual(eventCallback.mock.calls[0]?.arguments[1], 'two');
+	assert.strictEqual(eventCallback.mock.calls[0]?.arguments[2], '3');
 });
 
 test('fire close event', async () => {
-	const eventCallback = jest.fn();
+	const eventCallback = mock.fn();
 	socket.on('disconnect', eventCallback);
 	server.close();
 
@@ -58,7 +60,7 @@ test('fire close event', async () => {
 
 	await wait(300);
 
-	expect(eventCallback.mock.calls.length).toBe(1);
+	assert.strictEqual(eventCallback.mock.calls.length, 1);
 });
 
 // afterAll(done => {
