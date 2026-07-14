@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.1](https://github.com/osztenkurden/simple-websockets/compare/v3.0.0...v3.0.1) (2026-07-14)
+
+
+### Bug Fixes
+
+* move to tsc 7 & update deps ([a6c62bd](https://github.com/osztenkurden/simple-websockets/commit/a6c62bd7d418938ca443daa44c699f13771472c2))
+
 ## [3.0.0](https://github.com/osztenkurden/simple-websockets/compare/v2.2.2...v3.0.0) (2026-04-14)
 
 
