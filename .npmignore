@@ -1,7 +1,5 @@
 .git
 .github
-.eslintignore
-.eslintrc
 .prettierignore
 .gitignore
 .prettierrc
@@ -14,5 +12,4 @@ tsconfig.json
 tsconfig.esm.json
 jest.config.ts
 coverage
-eslint.config.js
 README.md

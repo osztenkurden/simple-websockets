@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: "Lint, Typecheck & Test on Node ${{ matrix.node-version }}"
+    name: "Typecheck & Test on Node ${{ matrix.node-version }}"
     runs-on: ubuntu-latest
 
     strategy:
@@ -23,6 +23,5 @@ jobs:
     - name: Setup Bun
       uses: oven-sh/setup-bun@v2
     - run: bun i
-    - run: bun run lint
     - run: bun run typecheck
     - run: node --test
